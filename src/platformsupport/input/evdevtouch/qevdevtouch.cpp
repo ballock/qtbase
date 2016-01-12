@@ -186,6 +186,8 @@ QEvdevTouchScreenHandler::QEvdevTouchScreenHandler(const QString &specification,
 
     QString dev;
     int rotationAngle = 0;
+    int overrideMaxX = 0;
+    int overrideMaxY = 0;
     for (int i = 0; i < args.count(); ++i) {
         if (args.at(i).startsWith(QLatin1String("/dev/")) && dev.isEmpty()) {
             dev = args.at(i);
@@ -202,6 +204,22 @@ QEvdevTouchScreenHandler::QEvdevTouchScreenHandler(const QString &specification,
                 default:
                     break;
                 }
+            }
+        } else if (args.at(i).startsWith(QLatin1String("xmax"))) {
+            QString xmaxArg = args.at(i).section(QLatin1Char('='), 1, 1);
+            bool ok;
+            uint argValue = xmaxArg.toUInt(&ok);
+            if (ok) {
+                if (argValue > 0)
+                    overrideMaxX = argValue;
+            }
+        } else if (args.at(i).startsWith(QLatin1String("ymax"))) {
+            QString ymaxArg = args.at(i).section(QLatin1Char('='), 1, 1);
+            bool ok;
+            uint argValue = ymaxArg.toUInt(&ok);
+            if (ok) {
+                if (argValue > 0)
+                    overrideMaxY = argValue;
             }
         }
     }
@@ -317,6 +335,18 @@ QEvdevTouchScreenHandler::QEvdevTouchScreenHandler(const QString &specification,
         if (printDeviceInfo)
             qDebug("evdevtouch: found ti-tsc, overriding: min X: %d max X: %d min Y: %d max Y: %d",
                    d->hw_range_x_min, d->hw_range_x_max, d->hw_range_y_min, d->hw_range_y_max);
+    }
+
+    if (overrideMaxX > 0) {
+        qDebug("evdevtouch: Rescaling input dev max X from: %d to: %d.",
+               d->hw_range_x_max, overrideMaxX);
+        d->hw_range_x_max = overrideMaxX;
+    }
+
+    if (overrideMaxY > 0) {
+        qDebug("evdevtouch: Rescaling input dev max Y from: %d to: %d.",
+               d->hw_range_y_max, overrideMaxY);
+        d->hw_range_y_max = overrideMaxY;
     }
 
     bool grabSuccess = !ioctl(m_fd, EVIOCGRAB, (void *) 1);
