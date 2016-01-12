@@ -337,13 +337,13 @@ QEvdevTouchScreenHandler::QEvdevTouchScreenHandler(const QString &specification,
                    d->hw_range_x_min, d->hw_range_x_max, d->hw_range_y_min, d->hw_range_y_max);
     }
 
-    if (overrideMaxX > 0) {
+    if (overrideMaxX > 0) {
         qDebug("evdevtouch: Rescaling input dev max X from: %d to: %d.",
                d->hw_range_x_max, overrideMaxX);
         d->hw_range_x_max = overrideMaxX;
     }
 
-    if (overrideMaxY > 0) {
+    if (overrideMaxY > 0) {
         qDebug("evdevtouch: Rescaling input dev max Y from: %d to: %d.",
                d->hw_range_y_max, overrideMaxY);
         d->hw_range_y_max = overrideMaxY;
